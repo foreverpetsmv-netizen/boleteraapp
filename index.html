@@ -778,7 +778,8 @@ async function handleScan(input){
   reader.onload=async function(e){
     const b64=e.target.result.split(',')[1];
     try{
-      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:file.type,data:b64}},{type:'text',text:'Extraé los datos de esta boleta y respondé SOLO en JSON sin nada más: {"empresa":"","numero":"","fecha_emision":"YYYY-MM-DD","fecha_vencimiento":"YYYY-MM-DD","monto":0}. Campos no encontrados dejá vacíos o 0.'}]})]}));
+      const prompt='Extraé los datos de esta boleta y respondé SOLO en JSON sin nada más: {"empresa":"","numero":"","fecha_emision":"YYYY-MM-DD","fecha_vencimiento":"YYYY-MM-DD","monto":0}. Campos no encontrados dejá vacíos o 0.';
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:file.type,data:b64}},{type:'text',text:prompt}]}]})});
       const data=await resp.json();
       const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
       const p=JSON.parse(txt);
