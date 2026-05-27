@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#3266ad">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="BoleteraApp">
+<title>BoleteraApp</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#f5f5f3;--surface:#ffffff;--border:#e8e8e5;--border2:#d0d0cc;
+  --text:#1a1a18;--text2:#6b6b68;--text3:#9b9b98;
+  --blue:#3266ad;--blue-bg:#e6f1fb;--blue-text:#185fa5;
+  --green:#2d7a4f;--green-bg:#eaf3de;--green-text:#3b6d11;
+  --amber:#854f0b;--amber-bg:#faeeda;
+  --red:#a32d2d;--red-bg:#fcebeb;
+  --radius:10px;--radius-sm:7px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#111110;--surface:#1c1c1a;--border:#2e2e2b;--border2:#3e3e3b;
+    --text:#f0f0ec;--text2:#9b9b98;--text3:#6b6b68;
+    --blue-bg:#0c2040;--blue-text:#85b7eb;
+    --green-bg:#0a1f0f;--green-text:#97c459;
+    --amber-bg:#1f1200;
+    --red-bg:#1f0808;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.app{display:flex;height:100dvh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.logo{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.logo-icon{width:36px;height:36px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+.logo-title{font-size:16px;font-weight:600;color:var(--text)}
+.logo-sub{font-size:11px;color:var(--text3)}
+.db-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:20px;margin-top:6px}
+.db-ok{background:var(--green-bg);color:var(--green-text)}
+.db-err{background:var(--red-bg);color:var(--red)}
+.db-loading{background:var(--border);color:var(--text2)}
+.nav-section{padding:14px 18px 4px;font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;font-size:13px;color:var(--text2);border-left:3px solid transparent;transition:all .15s;user-select:none}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--blue-bg);color:var(--blue-text);border-left-color:var(--blue);font-weight:500}
+.nav-item i{font-size:18px}
+.nav-badge{margin-left:auto;background:#e24b4a;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:600;display:none}
+.sidebar-footer{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border)}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;flex-shrink:0}
+.topbar-title{font-size:16px;font-weight:600;color:var(--text)}
+.topbar-actions{display:flex;gap:8px}
+.content{padding:20px;flex:1}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-size:13px;color:var(--text);font-family:inherit;transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--bg)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:#1e4d8c}
+.btn-danger{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+/* CARDS & GRID */
+.grid-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+@media(min-width:700px){.grid-stats{grid-template-columns:repeat(4,1fr)}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.stat-label{font-size:11px;color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.stat-value{font-size:22px;font-weight:700;color:var(--text)}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:500px}
+th{text-align:left;padding:9px 12px;color:var(--text3);font-weight:600;font-size:11px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.td-actions{display:flex;gap:4px;white-space:nowrap}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-success{background:var(--green-bg);color:var(--green-text)}
+.badge-warning{background:var(--amber-bg);color:var(--amber)}
+.badge-danger{background:var(--red-bg);color:var(--red)}
+.badge-info{background:var(--blue-bg);color:var(--blue-text)}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* MODALS */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center;padding:0}
+@media(min-width:600px){.modal-overlay{align-items:center;padding:20px}}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:20px;width:100%;max-height:92dvh;overflow-y:auto}
+@media(min-width:600px){.modal{border-radius:var(--radius);max-width:580px;max-height:88vh}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px;display:block}
+@media(min-width:600px){.modal-handle{display:none}}
+.modal-title{font-size:16px;font-weight:600;color:var(--text)}
+
+/* FORMS */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+label{font-size:12px;color:var(--text2);font-weight:500}
+input,select,textarea{padding:9px 11px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);width:100%;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(50,102,173,.15)}
+textarea{resize:vertical;min-height:72px}
+.product-row{display:grid;grid-template-columns:2fr 80px 100px 36px;gap:7px;align-items:center;margin-bottom:8px}
+
+/* ALERTS */
+.alert-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);margin-bottom:8px}
+.alert-urgent{background:var(--red-bg);border:1px solid #f7c1c1}
+.alert-warn{background:var(--amber-bg);border:1px solid #fac775}
+
+/* MISC */
+.filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.nota-item{background:var(--bg);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-state i{font-size:40px;display:block;margin-bottom:10px;opacity:.4}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--radius);padding:28px;text-align:center;cursor:pointer;transition:.15s}
+.upload-zone:hover{border-color:var(--blue);background:var(--blue-bg)}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:2px;background:var(--blue);transition:width .4s}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
+.tab{padding:9px 16px;font-size:13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.mobile-nav-items{display:flex;justify-content:space-around}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px;cursor:pointer;font-size:10px;color:var(--text3);min-width:56px;transition:color .15s}
+.mobile-nav-item.active{color:var(--blue)}
+.mobile-nav-item i{font-size:22px}
+.mobile-fab{position:fixed;bottom:calc(70px + env(safe-area-inset-bottom));right:18px;width:52px;height:52px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-size:24px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(50,102,173,.4);z-index:51}
+
+@media(max-width:700px){
+  .sidebar{display:none}
+  .mobile-nav{display:block}
+  .mobile-fab{display:flex}
+  .content{padding:14px 14px 90px}
+  .topbar{padding:12px 14px}
+  .topbar-actions .btn:not(.btn-sm){display:none}
+  .grid-stats{grid-template-columns:repeat(2,1fr)}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR (desktop) -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-row">
+        <div class="logo-icon"><i class="ti ti-receipt-2" aria-hidden="true"></i></div>
+        <div>
+          <div class="logo-title">BoleteraApp</div>
+          <div class="logo-sub">Gestión de compras</div>
+        </div>
+      </div>
+      <div id="db-badge" class="db-badge db-loading"><i class="ti ti-loader-2" style="font-size:11px" aria-hidden="true"></i>Conectando...</div>
+    </div>
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="navTo('dashboard',this)"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</div>
+    <div class="nav-item" onclick="navTo('boletas',this)"><i class="ti ti-receipt" aria-hidden="true"></i>Boletas</div>
+    <div class="nav-item" onclick="navTo('proveedores',this)"><i class="ti ti-building-store" aria-hidden="true"></i>Proveedores</div>
+    <div class="nav-section">Gestión</div>
+    <div class="nav-item" onclick="navTo('notas',this)"><i class="ti ti-file-minus" aria-hidden="true"></i>Notas de crédito</div>
+    <div class="nav-item" onclick="navTo('alertas',this)"><i class="ti ti-bell-ringing" aria-hidden="true"></i>Alertas <span id="alert-count" class="nav-badge">0</span></div>
+    <div class="nav-section">Análisis</div>
+    <div class="nav-item" onclick="navTo('reportes',this)"><i class="ti ti-chart-bar" aria-hidden="true"></i>Reportes</div>
+    <div class="nav-item" onclick="navTo('productos',this)"><i class="ti ti-packages" aria-hidden="true"></i>Productos</div>
+    <div class="sidebar-footer">
+      <div style="font-size:11px;color:var(--text3)">foreverpetsmv@gmail.com</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:2px">boleteraapp · sa-east-1</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="btn btn-sm" onclick="openModal('modal-scan')"><i class="ti ti-camera" aria-hidden="true"></i>Escanear</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-boleta')"><i class="ti ti-plus" aria-hidden="true"></i>Nueva boleta</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="grid-stats">
+          <div class="stat-card"><div class="stat-label"><i class="ti ti-receipt" style="font-size:12px" aria-hidden="true"></i>Boletas</div><div class="stat-value" id="m-total">—</div><div class="stat-sub" id="m-total-sub">cargando...</div></div>
+          <div class="stat-card"><div class="stat-label"><i class="ti ti-currency-dollar" style="font-size:12px" aria-hidden="true"></i>Monto total</div><div class="stat-value" id="m-monto">—</div><div class="stat-sub">todas las boletas</div></div>
+          <div class="stat-card"><div class="stat-label"><i class="ti ti-clock-exclamation" style="font-size:12px" aria-hidden="true"></i>Pendientes</div><div class="stat-value" id="m-pend" style="color:var(--red)">—</div><div class="stat-sub" id="m-pend-monto">cargando...</div></div>
+          <div class="stat-card"><div class="stat-label"><i class="ti ti-file-minus" style="font-size:12px" aria-hidden="true"></i>Notas crédito</div><div class="stat-value" id="m-notas">—</div><div class="stat-sub">registradas</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr;gap:16px">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-bell-ringing" aria-hidden="true"></i>Vencimientos próximos</div></div>
+            <div id="dash-alertas"><div style="color:var(--text3);font-size:13px">Cargando...</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-building-store" aria-hidden="true"></i>Top proveedores</div></div>
+            <div id="dash-prov"><div style="color:var(--text3);font-size:13px">Cargando...</div></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-list" aria-hidden="true"></i>Últimas boletas</div>
+            <button class="btn btn-sm" onclick="navTo('boletas',null)">Ver todas</button>
+          </div>
+          <div class="table-wrap" id="dash-tabla"><div style="color:var(--text3);font-size:13px;padding:8px">Cargando...</div></div>
+        </div>
+      </div>
+
+      <!-- BOLETAS -->
+      <div class="page" id="page-boletas">
+        <div class="filter-row">
+          <input type="text" placeholder="Buscar empresa o número..." style="flex:1;min-width:160px" oninput="filterBoletas(this.value)">
+          <select onchange="filterEstado(this.value)" style="width:140px">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="pagada">Pagada</option>
+            <option value="vencida">Vencida</option>
+          </select>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="table-wrap" id="tabla-boletas"><div style="padding:20px;color:var(--text3);font-size:13px">Cargando...</div></div>
+        </div>
+      </div>
+
+      <!-- PROVEEDORES -->
+      <div class="page" id="page-proveedores">
+        <div id="grid-prov" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+          <div style="color:var(--text3);font-size:13px">Cargando...</div>
+        </div>
+      </div>
+
+      <!-- NOTAS -->
+      <div class="page" id="page-notas">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+          <button class="btn btn-primary" onclick="openModal('modal-nota')"><i class="ti ti-plus" aria-hidden="true"></i>Nueva nota de crédito</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="ti ti-file-minus" aria-hidden="true"></i>Notas de crédito</div></div>
+          <div id="lista-notas"><div style="color:var(--text3);font-size:13px">Cargando...</div></div>
+        </div>
+      </div>
+
+      <!-- ALERTAS -->
+      <div class="page" id="page-alertas">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="ti ti-bell-ringing" aria-hidden="true"></i>Configuración de alertas</div></div>
+          <div class="form-row" style="margin-bottom:16px">
+            <div class="form-group"><label>Alerta anticipada (días)</label><input type="number" id="dias1" value="7" min="1" max="30"></div>
+            <div class="form-group"><label>Segunda alerta (días)</label><input type="number" id="dias2" value="3" min="1" max="30"></div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="renderAlertas()" style="margin-bottom:16px"><i class="ti ti-refresh" aria-hidden="true"></i>Actualizar</button>
+          <div id="alertas-lista"><div style="color:var(--text3);font-size:13px">Cargando...</div></div>
+        </div>
+      </div>
+
+      <!-- REPORTES -->
+      <div class="page" id="page-reportes">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'rep-periodo')">Por período</div>
+          <div class="tab" onclick="switchTab(this,'rep-prov')">Por proveedor</div>
+          <div class="tab" onclick="switchTab(this,'rep-pagos')">Estado pagos</div>
+        </div>
+        <div id="rep-periodo">
+          <div class="filter-row">
+            <input type="date" id="rep-desde" style="flex:1">
+            <input type="date" id="rep-hasta" style="flex:1">
+            <button class="btn btn-primary btn-sm" onclick="loadReporte()"><i class="ti ti-chart-bar" aria-hidden="true"></i>Generar</button>
+          </div>
+          <div id="rep-periodo-result"></div>
+        </div>
+        <div id="rep-prov" style="display:none">
+          <div class="card" style="padding:0;overflow:hidden"><div class="table-wrap" id="rep-prov-tabla"><div style="padding:20px;color:var(--text3)">Cargando...</div></div></div>
+        </div>
+        <div id="rep-pagos" style="display:none">
+          <div class="grid-stats" id="rep-pagos-cards"><div style="color:var(--text3)">Cargando...</div></div>
+        </div>
+      </div>
+
+      <!-- PRODUCTOS -->
+      <div class="page" id="page-productos">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="ti ti-packages" aria-hidden="true"></i>Productos comprados</div></div>
+          <div class="table-wrap" id="tabla-productos"><div style="padding:8px;color:var(--text3)">Cargando...</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" aria-label="Navegación móvil">
+  <div class="mobile-nav-items">
+    <div class="mobile-nav-item active" onclick="navTo('dashboard',this)" data-page="dashboard"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Inicio</div>
+    <div class="mobile-nav-item" onclick="navTo('boletas',this)" data-page="boletas"><i class="ti ti-receipt" aria-hidden="true"></i>Boletas</div>
+    <div class="mobile-nav-item" onclick="navTo('alertas',this)" data-page="alertas"><i class="ti ti-bell-ringing" aria-hidden="true"></i>Alertas</div>
+    <div class="mobile-nav-item" onclick="navTo('reportes',this)" data-page="reportes"><i class="ti ti-chart-bar" aria-hidden="true"></i>Reportes</div>
+    <div class="mobile-nav-item" onclick="navTo('notas',this)" data-page="notas"><i class="ti ti-file-minus" aria-hidden="true"></i>Notas</div>
+  </div>
+</nav>
+<button class="mobile-fab" onclick="openModal('modal-boleta')" aria-label="Nueva boleta"><i class="ti ti-plus" aria-hidden="true"></i></button>
+
+<!-- MODAL NUEVA BOLETA -->
+<div class="modal-overlay" id="modal-boleta" onclick="handleOverlayClick(event,'modal-boleta')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-receipt" style="margin-right:6px" aria-hidden="true"></i>Nueva boleta</div>
+      <button class="btn btn-sm" onclick="closeModal('modal-boleta')"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Empresa / Proveedor *</label><input type="text" id="f-empresa" placeholder="Ej: Distribuidora ABC" autocomplete="organization"></div>
+      <div class="form-group"><label>N° Boleta *</label><input type="text" id="f-numero" placeholder="Ej: 00245"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Fecha de emisión</label><input type="date" id="f-emision"></div>
+      <div class="form-group"><label>Fecha de vencimiento</label><input type="date" id="f-vencimiento"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Monto total ($)</label><input type="number" id="f-monto" placeholder="0" inputmode="numeric"></div>
+      <div class="form-group"><label>Estado</label>
+        <select id="f-estado"><option value="pendiente">Pendiente</option><option value="pagada">Pagada</option><option value="vencida">Vencida</option></select>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px">PRODUCTOS</div>
+      <div style="display:grid;grid-template-columns:2fr 80px 100px 36px;gap:7px;margin-bottom:4px">
+        <span style="font-size:11px;color:var(--text3)">Descripción</span>
+        <span style="font-size:11px;color:var(--text3)">Cant.</span>
+        <span style="font-size:11px;color:var(--text3)">Precio</span>
+        <span></span>
+      </div>
+      <div id="productos-lista">
+        <div class="product-row"><input type="text" placeholder="Producto..."><input type="number" placeholder="1" min="0" inputmode="numeric"><input type="number" placeholder="$0" min="0" inputmode="numeric"><button class="btn btn-sm" style="padding:5px 8px" onclick="this.parentElement.remove()"><i class="ti ti-trash" aria-hidden="true"></i></button></div>
+      </div>
+      <button class="btn btn-sm" style="margin-top:6px" onclick="addProductRow()"><i class="ti ti-plus" aria-hidden="true"></i>Agregar</button>
+    </div>
+    <div class="form-group"><label>Notas</label><textarea id="f-notas" placeholder="Observaciones..."></textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+      <button class="btn" onclick="closeModal('modal-boleta')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-save" onclick="saveBoleta()"><i class="ti ti-device-floppy" aria-hidden="true"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ESCANEAR -->
+<div class="modal-overlay" id="modal-scan" onclick="handleOverlayClick(event,'modal-scan')">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-camera" style="margin-right:6px" aria-hidden="true"></i>Escanear boleta con IA</div>
+      <button class="btn btn-sm" onclick="closeModal('modal-scan')"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+      <i class="ti ti-photo-scan" style="font-size:38px;color:var(--blue);display:block;margin-bottom:10px" aria-hidden="true"></i>
+      <div style="font-size:15px;font-weight:600;margin-bottom:4px">Subir foto de boleta</div>
+      <div style="font-size:13px;color:var(--text2)">Tocá para seleccionar desde galería o cámara</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">JPG, PNG · Máx. 10MB</div>
+    </div>
+    <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none" onchange="handleScan(this)">
+    <div id="scan-result" style="display:none;margin-top:16px">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--green-bg);border-radius:var(--radius-sm);margin-bottom:14px">
+        <i class="ti ti-circle-check" style="color:var(--green-text);font-size:18px" aria-hidden="true"></i>
+        <span style="font-size:13px;color:var(--green-text);font-weight:600">Boleta detectada — revisá y confirmá</span>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Empresa</label><input type="text" id="sc-empresa"></div>
+        <div class="form-group"><label>N° Boleta</label><input type="text" id="sc-numero"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Emisión</label><input type="date" id="sc-emision"></div>
+        <div class="form-group"><label>Vencimiento</label><input type="date" id="sc-vencimiento"></div>
+      </div>
+      <div class="form-group"><label>Monto ($)</label><input type="number" id="sc-monto" inputmode="numeric"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+        <button class="btn" onclick="closeModal('modal-scan')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-scan-save" onclick="confirmScan()"><i class="ti ti-device-floppy" aria-hidden="true"></i>Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOTA DE CRÉDITO -->
+<div class="modal-overlay" id="modal-nota" onclick="handleOverlayClick(event,'modal-nota')">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-file-minus" style="margin-right:6px" aria-hidden="true"></i>Nueva nota de crédito</div>
+      <button class="btn btn-sm" onclick="closeModal('modal-nota')"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Empresa *</label><input type="text" id="n-empresa" placeholder="Ej: Distribuidora ABC"></div>
+      <div class="form-group"><label>N° Nota *</label><input type="text" id="n-numero" placeholder="NC-001"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Fecha</label><input type="date" id="n-fecha"></div>
+      <div class="form-group"><label>Monto ($) *</label><input type="number" id="n-monto" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div class="form-group"><label>Asignar a boleta</label><select id="n-boleta"><option value="">— Sin asignar —</option></select></div>
+    <div class="form-group"><label>Motivo</label><textarea id="n-motivo" placeholder="Motivo de la nota de crédito..."></textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+      <button class="btn" onclick="closeModal('modal-nota')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-nota-save" onclick="saveNota()"><i class="ti ti-device-floppy" aria-hidden="true"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal-overlay" id="modal-detalle" onclick="handleOverlayClick(event,'modal-detalle')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="det-titulo">Detalle de boleta</div>
+      <button class="btn btn-sm" onclick="closeModal('modal-detalle')"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div id="det-contenido"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL='https://uzupofsghqkilwwihkws.supabase.co';
+const SUPA_KEY='sb_publishable_mif1hIcb7BVIVnvnDOGKsg_9AqNHkgA';
+const ANTH_KEY=''; // Opcional: pegá tu Anthropic API key para el escaneo con IA
+const H={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'};
+
+async function db(method,table,body,params=''){
+  const url=SUPA_URL+'/rest/v1/'+table+(params?'?'+params:'');
+  const r=await fetch(url,{method,headers:H,body:body?JSON.stringify(body):undefined});
+  if(!r.ok){const e=await r.text();throw new Error(e);}
+  if(r.status===204)return null;
+  return r.json();
+}
+const get=(t,p='')=>db('GET',t,null,p);
+const post=(t,b)=>db('POST',t,b);
+const patch=(t,b,p)=>db('PATCH',t,b,p);
+const del=(t,p)=>db('DELETE',t,null,p);
+
+let allBoletas=[], allNotas=[];
+
+const fmt=n=>n||n===0?'$'+Number(n).toLocaleString('es-CL'):'—';
+const fmtD=d=>{if(!d)return'—';const p=d.split('T')[0].split('-');return p[2]+'/'+p[1]+'/'+p[0]};
+const badgeE=e=>({pagada:'<span class="badge badge-success">Pagada</span>',pendiente:'<span class="badge badge-warning">Pendiente</span>',vencida:'<span class="badge badge-danger">Vencida</span>'}[e]||`<span class="badge">${e}</span>`);
+
+function toast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=ok?'#1a5c33':'#7a1a1a';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+async function initDB(){
+  const badge=document.getElementById('db-badge');
+  try{
+    await get('boletas','limit=1');
+    badge.className='db-badge db-ok';
+    badge.innerHTML='<i class="ti ti-cloud-check" style="font-size:11px"></i>Conectado';
+    await loadAll();
+  }catch(e){
+    badge.className='db-badge db-err';
+    badge.innerHTML='<i class="ti ti-cloud-off" style="font-size:11px"></i>Sin conexión';
+    toast('Error al conectar con Supabase',false);
+  }
+}
+
+async function loadAll(){
+  allBoletas=await get('boletas','order=created_at.desc')||[];
+  allNotas=await get('notas_credito','order=created_at.desc')||[];
+  renderDashboard();
+  updateAlertBadge();
+}
+
+function updateAlertBadge(){
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const n=allBoletas.filter(b=>{
+    if(b.estado==='pagada'||!b.fecha_vencimiento)return false;
+    const v=new Date(b.fecha_vencimiento);v.setHours(0,0,0,0);
+    return Math.ceil((v-hoy)/86400000)<=7;
+  }).length;
+  const badge=document.getElementById('alert-count');
+  badge.textContent=n;badge.style.display=n>0?'inline':'none';
+}
+
+function renderDashboard(){
+  const total=allBoletas.length;
+  const monto=allBoletas.reduce((a,b)=>a+Number(b.monto||0),0);
+  const pend=allBoletas.filter(b=>b.estado==='pendiente');
+  const montoPend=pend.reduce((a,b)=>a+Number(b.monto||0),0);
+  document.getElementById('m-total').textContent=total;
+  document.getElementById('m-total-sub').textContent='registradas';
+  document.getElementById('m-monto').textContent=fmt(monto);
+  document.getElementById('m-pend').textContent=pend.length;
+  document.getElementById('m-pend-monto').textContent=fmt(montoPend)+' por pagar';
+  document.getElementById('m-notas').textContent=allNotas.length;
+
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const prox=allBoletas.filter(b=>{
+    if(b.estado==='pagada'||!b.fecha_vencimiento)return false;
+    const v=new Date(b.fecha_vencimiento);v.setHours(0,0,0,0);
+    return Math.ceil((v-hoy)/86400000)<=10;
+  }).slice(0,4);
+
+  document.getElementById('dash-alertas').innerHTML=prox.length?prox.map(b=>{
+    const v=new Date(b.fecha_vencimiento);v.setHours(0,0,0,0);
+    const diff=Math.ceil((v-hoy)/86400000);
+    const u=diff<=1;
+    return`<div class="alert-item ${u?'alert-urgent':'alert-warn'}">
+      <i class="ti ti-${u?'alert-circle':'clock'}" style="color:${u?'var(--red)':'var(--amber)'};font-size:20px"></i>
+      <div style="flex:1"><div style="font-weight:600;font-size:13px">${b.empresa}</div>
+      <div style="font-size:11px;color:var(--text2)">Boleta #${b.numero} · ${diff<=0?'<strong>Vence HOY</strong>':'Vence en '+diff+' día'+(diff===1?'':'s')}</div></div>
+      <div style="font-weight:700;color:${u?'var(--red)':'var(--amber)'}">${fmt(b.monto)}</div>
+    </div>`}).join(''):'<div class="empty-state" style="padding:16px 0"><i class="ti ti-circle-check" style="font-size:24px;color:var(--green-text)"></i><div style="font-size:13px;margin-top:4px">Sin vencimientos próximos</div></div>';
+
+  const pm={};allBoletas.forEach(b=>{if(!pm[b.empresa])pm[b.empresa]={n:0,t:0};pm[b.empresa].n++;pm[b.empresa].t+=Number(b.monto||0)});
+  const pl=Object.entries(pm).sort((a,b)=>b[1].t-a[1].t).slice(0,5);
+  const mx=pl[0]?pl[0][1].t:1;
+  document.getElementById('dash-prov').innerHTML=pl.length?pl.map(([n,v])=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:600">${n}</span><span style="font-size:13px">${fmt(v.t)}</span></div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:3px">${v.n} boleta${v.n!==1?'s':''}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(v.t/mx*100)}%"></div></div>
+    </div>`).join(''):'<div style="color:var(--text3);font-size:13px">Sin datos</div>';
+
+  const dt=document.getElementById('dash-tabla');
+  if(!allBoletas.length){dt.innerHTML='<div class="empty-state"><i class="ti ti-receipt"></i>No hay boletas. ¡Agregá la primera!</div>';return;}
+  dt.innerHTML=`<table><thead><tr><th>N° Boleta</th><th>Empresa</th><th>Vencimiento</th><th>Monto</th><th>Estado</th><th></th></tr></thead><tbody>`+
+    allBoletas.slice(0,6).map(b=>`<tr>
+      <td style="font-weight:600">#${b.numero}</td><td>${b.empresa}</td>
+      <td>${fmtD(b.fecha_vencimiento)}</td><td style="font-weight:600">${fmt(b.monto)}</td>
+      <td>${badgeE(b.estado)}</td>
+      <td><button class="btn btn-sm" onclick="showDetalle('${b.id}')"><i class="ti ti-eye"></i></button></td>
+    </tr>`).join('')+'</tbody></table>';
+}
+
+function renderBoletas(list){
+  const wrap=document.getElementById('tabla-boletas');
+  const data=list||allBoletas;
+  if(!data.length){wrap.innerHTML='<div class="empty-state"><i class="ti ti-receipt"></i>No hay boletas que mostrar</div>';return;}
+  wrap.innerHTML=`<table><thead><tr><th>N°</th><th>Empresa</th><th>Vencimiento</th><th>Monto</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>`+
+    data.map(b=>`<tr>
+      <td style="font-weight:600">#${b.numero}</td><td>${b.empresa}</td>
+      <td>${fmtD(b.fecha_vencimiento)}</td><td style="font-weight:600">${fmt(b.monto)}</td>
+      <td>${badgeE(b.estado)}</td>
+      <td class="td-actions">
+        <button class="btn btn-sm" onclick="showDetalle('${b.id}')"><i class="ti ti-eye"></i></button>
+        <button class="btn btn-sm" onclick="togglePago('${b.id}','${b.estado}')"><i class="ti ti-${b.estado==='pagada'?'rotate-clockwise':'circle-check'}"></i></button>
+        <button class="btn btn-sm" onclick="delBoleta('${b.id}')"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`).join('')+'</tbody></table>';
+}
+
+function renderNotas(){
+  const el=document.getElementById('lista-notas');
+  if(!allNotas.length){el.innerHTML='<div class="empty-state"><i class="ti ti-file-minus"></i>No hay notas de crédito</div>';return;}
+  el.innerHTML=allNotas.map(n=>`<div class="nota-item">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:600">${n.numero} — ${n.empresa}</div>
+      <div style="font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${fmtD(n.fecha)} · ${n.motivo||'Sin motivo'}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div style="font-size:14px;font-weight:700;color:var(--green-text)">${fmt(n.monto)}</div>
+      <button class="btn btn-sm" onclick="delNota('${n.id}')"><i class="ti ti-trash"></i></button>
+    </div>
+  </div>`).join('');
+}
+
+function renderAlertas(){
+  const dias=parseInt(document.getElementById('dias1').value)||7;
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const lista=allBoletas.filter(b=>{
+    if(b.estado==='pagada'||!b.fecha_vencimiento)return false;
+    const v=new Date(b.fecha_vencimiento);v.setHours(0,0,0,0);
+    return Math.ceil((v-hoy)/86400000)<=dias;
+  });
+  const el=document.getElementById('alertas-lista');
+  if(!lista.length){el.innerHTML='<div class="empty-state" style="padding:20px 0"><i class="ti ti-circle-check" style="color:var(--green-text)"></i>Sin vencimientos en ese período</div>';return;}
+  el.innerHTML=lista.map(b=>{
+    const v=new Date(b.fecha_vencimiento);v.setHours(0,0,0,0);
+    const diff=Math.ceil((v-hoy)/86400000);const u=diff<=2;
+    return`<div class="alert-item ${u?'alert-urgent':'alert-warn'}">
+      <i class="ti ti-${u?'alert-circle':'clock'}" style="color:${u?'var(--red)':'var(--amber)'};font-size:20px"></i>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${b.empresa} — #${b.numero}</div>
+        <div style="font-size:11px;color:var(--text2)">${diff<=0?'Vence HOY':'Vence en '+diff+' día'+(diff===1?'':'s')} · ${fmtD(b.fecha_vencimiento)}</div>
+      </div>
+      <div style="font-weight:700;color:${u?'var(--red)':'var(--amber)'}">${fmt(b.monto)}</div>
+    </div>`}).join('');
+}
+
+function renderProveedores(){
+  const pm={};
+  allBoletas.forEach(b=>{if(!pm[b.empresa])pm[b.empresa]={n:0,t:0,p:0};pm[b.empresa].n++;pm[b.empresa].t+=Number(b.monto||0);if(b.estado==='pagada')pm[b.empresa].p+=Number(b.monto||0)});
+  const pl=Object.entries(pm).sort((a,b)=>b[1].t-a[1].t);
+  const grid=document.getElementById('grid-prov');
+  if(!pl.length){grid.innerHTML='<div class="empty-state"><i class="ti ti-building-store"></i>No hay proveedores</div>';return;}
+  const colors=['#e6f1fb:#185fa5','#faeeda:#854f0b','#eaf3de:#3b6d11','#fbeaf0:#993556','#ede8fe:#534ab7'];
+  grid.innerHTML=pl.map(([nombre,v],i)=>{
+    const [bg,col]=colors[i%colors.length].split(':');
+    const ini=nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    return`<div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:40px;height:40px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:${col};flex-shrink:0">${ini}</div>
+        <div><div style="font-size:14px;font-weight:600">${nombre}</div><div style="font-size:11px;color:var(--text3)">${v.n} boleta${v.n!==1?'s':''}</div></div>
+      </div>
+      <div style="font-size:13px;color:var(--text2)">Total: <strong>${fmt(v.t)}</strong></div>
+      <div style="font-size:12px;color:var(--green-text);margin-top:2px">Pagado: ${fmt(v.p)}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${v.t?Math.round(v.p/v.t*100):0}%"></div></div>
+    </div>`}).join('');
+}
+
+function loadReporte(){
+  const desde=document.getElementById('rep-desde').value;
+  const hasta=document.getElementById('rep-hasta').value;
+  let data=allBoletas;
+  if(desde)data=data.filter(b=>b.fecha_emision&&b.fecha_emision>=desde);
+  if(hasta)data=data.filter(b=>b.fecha_emision&&b.fecha_emision<=hasta);
+  const total=data.reduce((a,b)=>a+Number(b.monto||0),0);
+  document.getElementById('rep-periodo-result').innerHTML=`
+    <div class="grid-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px">
+      <div class="stat-card"><div class="stat-label">Boletas</div><div class="stat-value">${data.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" style="font-size:16px">${fmt(total)}</div></div>
+      <div class="stat-card"><div class="stat-label">Promedio</div><div class="stat-value" style="font-size:16px">${data.length?fmt(Math.round(total/data.length)):'—'}</div></div>
+    </div>
+    ${data.length?`<div class="card" style="padding:0;overflow:hidden"><div class="table-wrap"><table><thead><tr><th>N°</th><th>Empresa</th><th>Emisión</th><th>Monto</th><th>Estado</th></tr></thead><tbody>`+
+    data.map(b=>`<tr><td>#${b.numero}</td><td>${b.empresa}</td><td>${fmtD(b.fecha_emision)}</td><td>${fmt(b.monto)}</td><td>${badgeE(b.estado)}</td></tr>`).join('')+
+    '</tbody></table></div></div>':'<div class="empty-state"><i class="ti ti-search"></i>Sin boletas en ese período</div>'}`;
+}
+
+function renderRepProv(){
+  const pm={};allBoletas.forEach(b=>{if(!pm[b.empresa])pm[b.empresa]={n:0,t:0,p:0,pend:0};pm[b.empresa].n++;pm[b.empresa].t+=Number(b.monto||0);if(b.estado==='pagada')pm[b.empresa].p+=Number(b.monto||0);else pm[b.empresa].pend+=Number(b.monto||0)});
+  const pl=Object.entries(pm).sort((a,b)=>b[1].t-a[1].t);
+  document.getElementById('rep-prov-tabla').innerHTML=pl.length?
+    `<table><thead><tr><th>Proveedor</th><th>Boletas</th><th>Total</th><th>Pagado</th><th>Pendiente</th></tr></thead><tbody>`+
+    pl.map(([n,v])=>`<tr><td style="font-weight:600">${n}</td><td>${v.n}</td><td>${fmt(v.t)}</td><td style="color:var(--green-text)">${fmt(v.p)}</td><td style="color:var(--red)">${fmt(v.pend)}</td></tr>`).join('')+
+    '</tbody></table>':'<div class="empty-state" style="padding:20px">Sin datos</div>';
+}
+
+function renderRepPagos(){
+  const pa=allBoletas.filter(b=>b.estado==='pagada');
+  const pe=allBoletas.filter(b=>b.estado==='pendiente');
+  const ve=allBoletas.filter(b=>b.estado==='vencida');
+  document.getElementById('rep-pagos-cards').innerHTML=`
+    <div class="stat-card"><div class="stat-label" style="color:var(--green-text)"><i class="ti ti-circle-check" style="font-size:12px"></i>Pagadas</div><div class="stat-value" style="color:var(--green-text)">${pa.length}</div><div class="stat-sub">${fmt(pa.reduce((a,b)=>a+Number(b.monto||0),0))}</div></div>
+    <div class="stat-card"><div class="stat-label" style="color:var(--amber)"><i class="ti ti-clock" style="font-size:12px"></i>Pendientes</div><div class="stat-value" style="color:var(--amber)">${pe.length}</div><div class="stat-sub">${fmt(pe.reduce((a,b)=>a+Number(b.monto||0),0))}</div></div>
+    <div class="stat-card"><div class="stat-label" style="color:var(--red)"><i class="ti ti-alert-circle" style="font-size:12px"></i>Vencidas</div><div class="stat-value" style="color:var(--red)">${ve.length}</div><div class="stat-sub">${fmt(ve.reduce((a,b)=>a+Number(b.monto||0),0))}</div></div>`;
+}
+
+async function renderProductos(){
+  try{
+    const prods=await get('productos_boleta','select=descripcion,cantidad,precio_unitario')||[];
+    const pm={};prods.forEach(p=>{const k=p.descripcion||'Sin nombre';if(!pm[k])pm[k]={q:0,t:0};pm[k].q+=Number(p.cantidad||0);pm[k].t+=Number(p.cantidad||0)*Number(p.precio_unitario||0)});
+    const pl=Object.entries(pm).sort((a,b)=>b[1].t-a[1].t);
+    document.getElementById('tabla-productos').innerHTML=pl.length?
+      `<table><thead><tr><th>Producto</th><th>Unidades</th><th>Total</th><th>Precio prom.</th></tr></thead><tbody>`+
+      pl.map(([n,v])=>`<tr><td style="font-weight:600">${n}</td><td>${v.q.toLocaleString('es-CL')}</td><td>${fmt(v.t)}</td><td>${v.q?fmt(Math.round(v.t/v.q)):'—'}</td></tr>`).join('')+
+      '</tbody></table>':'<div class="empty-state"><i class="ti ti-packages"></i>No hay productos registrados</div>';
+  }catch(e){document.getElementById('tabla-productos').innerHTML='<div style="padding:16px;color:var(--text3)">Error al cargar</div>';}
+}
+
+async function showDetalle(id){
+  const b=allBoletas.find(x=>x.id===id);if(!b)return;
+  document.getElementById('det-titulo').textContent='Boleta #'+b.numero;
+  let prods=[];try{prods=await get('productos_boleta','boleta_id=eq.'+id)||[];}catch(e){}
+  const notasRel=allNotas.filter(n=>n.boleta_id===id);
+  document.getElementById('det-contenido').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div><div style="font-size:11px;color:var(--text3)">EMPRESA</div><div style="font-weight:600">${b.empresa}</div></div>
+      <div><div style="font-size:11px;color:var(--text3)">N° BOLETA</div><div style="font-weight:600">${b.numero}</div></div>
+      <div><div style="font-size:11px;color:var(--text3)">EMISIÓN</div><div>${fmtD(b.fecha_emision)}</div></div>
+      <div><div style="font-size:11px;color:var(--text3)">VENCIMIENTO</div><div>${fmtD(b.fecha_vencimiento)}</div></div>
+      <div><div style="font-size:11px;color:var(--text3)">MONTO</div><div style="font-size:20px;font-weight:700">${fmt(b.monto)}</div></div>
+      <div><div style="font-size:11px;color:var(--text3)">ESTADO</div><div style="margin-top:3px">${badgeE(b.estado)}</div></div>
+    </div>
+    ${b.notas?`<div style="background:var(--bg);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--text2)">${b.notas}</div>`:''}
+    ${prods.length?`<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:8px">PRODUCTOS</div>
+    <div class="table-wrap"><table><thead><tr><th>Descripción</th><th>Cant.</th><th>Precio</th><th>Subtotal</th></tr></thead><tbody>`+
+    prods.map(p=>`<tr><td>${p.descripcion||'—'}</td><td>${p.cantidad}</td><td>${fmt(p.precio_unitario)}</td><td>${fmt(Number(p.cantidad)*Number(p.precio_unitario))}</td></tr>`).join('')+
+    '</tbody></table></div></div>':''}
+    ${notasRel.length?`<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:8px">NOTAS DE CRÉDITO</div>`+
+    notasRel.map(n=>`<div class="nota-item"><div><div style="font-weight:600;font-size:13px">${n.numero}</div><div style="font-size:11px;color:var(--text2)">${n.motivo||''}</div></div><div style="color:var(--green-text);font-weight:700">${fmt(n.monto)}</div></div>`).join('')+'</div>':''}
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="togglePago('${b.id}','${b.estado}');closeModal('modal-detalle')"><i class="ti ti-${b.estado==='pagada'?'rotate-clockwise':'circle-check'}"></i>${b.estado==='pagada'?'Marcar pendiente':'Marcar pagada'}</button>
+      <button class="btn btn-sm btn-danger" onclick="delBoleta('${b.id}');closeModal('modal-detalle')"><i class="ti ti-trash"></i>Eliminar</button>
+    </div>`;
+  openModal('modal-detalle');
+}
+
+async function saveBoleta(){
+  const empresa=document.getElementById('f-empresa').value.trim();
+  const numero=document.getElementById('f-numero').value.trim();
+  if(!empresa||!numero){toast('Completá empresa y número',false);return;}
+  const btn=document.getElementById('btn-save');btn.disabled=true;btn.textContent='Guardando...';
+  try{
+    const res=await post('boletas',{empresa,numero,fecha_emision:document.getElementById('f-emision').value||null,fecha_vencimiento:document.getElementById('f-vencimiento').value||null,monto:parseFloat(document.getElementById('f-monto').value)||0,estado:document.getElementById('f-estado').value,notas:document.getElementById('f-notas').value||null});
+    const bid=res[0].id;
+    for(const row of document.querySelectorAll('#productos-lista .product-row')){
+      const inp=row.querySelectorAll('input');const desc=inp[0].value.trim();
+      if(desc)await post('productos_boleta',{boleta_id:bid,descripcion:desc,cantidad:parseFloat(inp[1].value)||1,precio_unitario:parseFloat(inp[2].value)||0});
+    }
+    closeModal('modal-boleta');
+    ['f-empresa','f-numero','f-emision','f-vencimiento','f-monto','f-notas'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-estado').value='pendiente';
+    document.getElementById('productos-lista').innerHTML='<div class="product-row"><input type="text" placeholder="Producto..."><input type="number" placeholder="1" min="0" inputmode="numeric"><input type="number" placeholder="$0" min="0" inputmode="numeric"><button class="btn btn-sm" style="padding:5px 8px" onclick="this.parentElement.remove()"><i class="ti ti-trash"></i></button></div>';
+    await loadAll();
+    toast('Boleta #'+numero+' guardada ☁️');
+  }catch(e){toast('Error: '+e.message,false);}
+  btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy"></i>Guardar';
+}
+
+async function togglePago(id,estado){
+  const nuevo=estado==='pagada'?'pendiente':'pagada';
+  try{await patch('boletas',{estado:nuevo},'id=eq.'+id);await loadAll();if(document.getElementById('page-boletas').classList.contains('active'))renderBoletas();toast('Estado actualizado');}
+  catch(e){toast('Error',false);}
+}
+
+async function delBoleta(id){
+  if(!confirm('¿Eliminar esta boleta? No se puede deshacer.'))return;
+  try{await del('productos_boleta','boleta_id=eq.'+id);await del('boletas','id=eq.'+id);await loadAll();if(document.getElementById('page-boletas').classList.contains('active'))renderBoletas();toast('Boleta eliminada');}
+  catch(e){toast('Error',false);}
+}
+
+async function saveNota(){
+  const empresa=document.getElementById('n-empresa').value.trim();
+  const numero=document.getElementById('n-numero').value.trim();
+  if(!empresa||!numero){toast('Completá empresa y número',false);return;}
+  const btn=document.getElementById('btn-nota-save');btn.disabled=true;
+  try{
+    await post('notas_credito',{empresa,numero,fecha:document.getElementById('n-fecha').value||null,monto:parseFloat(document.getElementById('n-monto').value)||0,motivo:document.getElementById('n-motivo').value||null,boleta_id:document.getElementById('n-boleta').value||null});
+    closeModal('modal-nota');
+    ['n-empresa','n-numero','n-fecha','n-monto','n-motivo'].forEach(id=>document.getElementById(id).value='');
+    await loadAll();renderNotas();toast('Nota de crédito guardada ☁️');
+  }catch(e){toast('Error: '+e.message,false);}
+  btn.disabled=false;
+}
+
+async function delNota(id){
+  if(!confirm('¿Eliminar esta nota?'))return;
+  try{await del('notas_credito','id=eq.'+id);await loadAll();renderNotas();toast('Nota eliminada');}
+  catch(e){toast('Error',false);}
+}
+
+function addProductRow(){
+  const el=document.createElement('div');el.className='product-row';
+  el.innerHTML='<input type="text" placeholder="Producto..."><input type="number" placeholder="1" min="0" inputmode="numeric"><input type="number" placeholder="$0" min="0" inputmode="numeric"><button class="btn btn-sm" style="padding:5px 8px" onclick="this.parentElement.remove()"><i class="ti ti-trash"></i></button>';
+  document.getElementById('productos-lista').appendChild(el);
+}
+
+async function handleScan(input){
+  if(!input.files.length)return;
+  const file=input.files[0];
+  const zone=document.getElementById('upload-zone');
+  zone.innerHTML='<i class="ti ti-loader-2" style="font-size:32px;color:var(--blue);display:block;margin-bottom:8px;animation:spin 1s linear infinite"></i><div style="font-size:13px;color:var(--text2)">Procesando con IA...</div>';
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    const b64=e.target.result.split(',')[1];
+    try{
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:file.type,data:b64}},{type:'text',text:'Extraé los datos de esta boleta y respondé SOLO en JSON sin nada más: {"empresa":"","numero":"","fecha_emision":"YYYY-MM-DD","fecha_vencimiento":"YYYY-MM-DD","monto":0}. Campos no encontrados dejá vacíos o 0.'}]})]}));
+      const data=await resp.json();
+      const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+      const p=JSON.parse(txt);
+      document.getElementById('sc-empresa').value=p.empresa||'';
+      document.getElementById('sc-numero').value=p.numero||'';
+      document.getElementById('sc-emision').value=p.fecha_emision||'';
+      document.getElementById('sc-vencimiento').value=p.fecha_vencimiento||'';
+      document.getElementById('sc-monto').value=p.monto||'';
+      zone.innerHTML='<i class="ti ti-circle-check" style="font-size:32px;color:var(--green-text);display:block;margin-bottom:8px"></i><div style="font-size:13px;color:var(--green-text);font-weight:600">Imagen procesada</div>';
+      document.getElementById('scan-result').style.display='block';
+    }catch(err){
+      zone.innerHTML='<i class="ti ti-alert-circle" style="font-size:32px;color:var(--red);display:block;margin-bottom:8px"></i><div style="font-size:13px;color:var(--red)">No se pudo procesar. Ingresá los datos manualmente.</div>';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function confirmScan(){
+  const empresa=document.getElementById('sc-empresa').value.trim();
+  const numero=document.getElementById('sc-numero').value.trim();
+  if(!empresa||!numero){toast('Completá empresa y número',false);return;}
+  const btn=document.getElementById('btn-scan-save');btn.disabled=true;
+  try{
+    await post('boletas',{empresa,numero,fecha_emision:document.getElementById('sc-emision').value||null,fecha_vencimiento:document.getElementById('sc-vencimiento').value||null,monto:parseFloat(document.getElementById('sc-monto').value)||0,estado:'pendiente'});
+    closeModal('modal-scan');document.getElementById('scan-result').style.display='none';
+    document.getElementById('upload-zone').innerHTML='<i class="ti ti-photo-scan" style="font-size:38px;color:var(--blue);display:block;margin-bottom:10px"></i><div style="font-size:15px;font-weight:600;margin-bottom:4px">Subir foto de boleta</div><div style="font-size:13px;color:var(--text2)">Tocá para seleccionar desde galería o cámara</div><div style="font-size:11px;color:var(--text3);margin-top:6px">JPG, PNG · Máx. 10MB</div>';
+    await loadAll();toast('Boleta escaneada guardada ☁️');
+  }catch(e){toast('Error: '+e.message,false);}
+  btn.disabled=false;
+}
+
+function openModal(id){
+  if(id==='modal-nota'){
+    const sel=document.getElementById('n-boleta');
+    sel.innerHTML='<option value="">— Sin asignar —</option>'+allBoletas.map(b=>`<option value="${b.id}">Boleta #${b.numero} — ${b.empresa}</option>`).join('');
+  }
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+function handleOverlayClick(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+
+function navTo(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item,.mobile-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(el)el.classList.add('active');
+  const titles={dashboard:'Dashboard',boletas:'Boletas',proveedores:'Proveedores',notas:'Notas de crédito',alertas:'Alertas',reportes:'Reportes',productos:'Productos'};
+  document.getElementById('page-title').textContent=titles[page]||page;
+  if(page==='boletas')renderBoletas();
+  if(page==='notas')renderNotas();
+  if(page==='alertas')renderAlertas();
+  if(page==='proveedores')renderProveedores();
+  if(page==='reportes'){renderRepProv();renderRepPagos();}
+  if(page==='productos')renderProductos();
+}
+
+function filterBoletas(q){renderBoletas(allBoletas.filter(b=>b.empresa.toLowerCase().includes(q.toLowerCase())||b.numero.includes(q)));}
+function filterEstado(e){renderBoletas(e?allBoletas.filter(b=>b.estado===e):allBoletas);}
+
+function switchTab(el,tabId){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  ['rep-periodo','rep-prov','rep-pagos'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById(tabId).style.display='block';
+}
+
+const style=document.createElement('style');
+style.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+
+const hoy=new Date().toISOString().split('T')[0];
+document.getElementById('rep-desde').value=hoy.substring(0,8)+'01';
+document.getElementById('rep-hasta').value=hoy;
+
+initDB();
+</script>
+</body>
+</html>
